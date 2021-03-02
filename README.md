@@ -1,20 +1,3 @@
-![alt Flask-Admin ](https://habrastorage.org/webt/fb/w2/42/fbw242ettd1fay8l4rwt3xtd-ac.png)
-![alt Flask-security ](https://habrastorage.org/webt/hq/ep/wj/hqepwjev4pucazix5ztzqw9pvk0.png)
-
-# Flask-Securyty & Flask-Admin & MongoDB in one app
-
-This code base serves as starting point for writing your next Flask application.
-
-## Code characteristics
-
-* Well organized directories with lots of comments
-    * app
-        * models
-        * static
-        * templates
-        * views
-* Sends error emails to admins for unhandled exceptions
-
 
 ## Setting up a development environment
 
@@ -50,7 +33,7 @@ See https://help.yahoo.com/kb/SLN27791.html
     python manage.py runserver
 
 
-Point your web browser to http://localhost:5000/
+Point your web browser to http://127.0.0.1:5000/
 
 You can make use of the following users:
 - email `user@example.com` with password `Password1`.
