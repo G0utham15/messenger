@@ -1,0 +1,197 @@
+{% extends "public/home_page.html" %}
+{% block message %}
+<div class="card text-dark bg-light">
+    <div class="card-body" style="padding: 0.5rem;">
+        <div style="float: left;">
+            <h5 class="card-title">{{ room.name }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted" style="margin: 0px;">
+                {% for i in roomMembers %}
+                {% if i!=current_user.username %}
+                {{i}}
+                {% endif %}
+                {% endfor %}
+            </h6>
+        </div>
+        <div class="dropdown fs-2" style="float: right; ">
+            <button class="btn" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="/static/icons/three-dots-vertical.svg">
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item btn btn-danger" href="{{url_for('public.leave_room', room_id=room._id)}}">Leave Room</a></li>
+            </ul>
+          </div>
+          
+    </div>
+</div>
+
+<button type="button" id="load_older_messages_btn">Load Older Messages</button>
+<div id="messages">
+    <ul class="list-group">
+        {% for message in messages %}
+            {% if message.sender==current_user.username %}
+            <li class="list-group-item">
+                <div class="col card text-center" style="float: right; width: fit-content;">
+                    <div class="card-body">
+                    <p class="card-text">
+                        {{ message.text }}
+                    </p>
+                    </div>
+                    <div class="card-footer text-muted">{{ message.created_at }}</div>
+                </div>
+                
+            </li>
+            {% else %}
+            <li class="list-group-item">
+                <div class="col card text-center" style="float: left; width: fit-content;">
+                    <div class="card-header">{{ message.sender }}</div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                {{ message.text }}
+                            </p>
+                        </div>
+                        <div class="card-footer text-muted">{{ message.created_at }}</div>
+                </div>
+            </li>
+            
+            {% endif %}
+        {% endfor %}
+        
+    </ul>
+</div>
+<div>
+<form id="message_input_form">
+    <input type="text" id="message_input" placeholder="Enter your message here">
+    <button type="submit">Send</button>
+</form>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
+<script>
+    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+    socket.on('connect', function () {
+        socket.emit('join_room', {
+            username: "{{ username }}",
+            room: "{{ room._id }}"
+        });
+
+        let message_input = document.getElementById('message_input');
+        
+        document.getElementById('message_input_form').onsubmit = function (e) {
+            e.preventDefault();
+            let message = message_input.value.trim();
+            if (message.length) {
+                socket.emit('send_message', {
+                    username: "{{ username }}",
+                    room: "{{ room._id }}",
+                    message: message
+                })
+            }
+            message_input.value = '';
+            message_input.focus();
+        }
+    });
+
+    let page = 0;
+
+    document.getElementById("load_older_messages_btn").onclick = (e) => {
+        page += 1;
+        fetch("/rooms/{{ room._id }}/messages?page=" + page, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            response.json().then(messages => {
+                messages.reverse().forEach(message => prepend_message(message.text, message.sender, message.created_at));
+            })
+        })
+    };
+
+    function prepend_message(message, username, created_at) {
+        const newNode = document.createElement('div');
+        if(username=={{current_user.username}}){
+            newNode.innerHTML =`
+                <div class="card text-center" style="float: right; width: fit-content;">
+                <div class="card-body">
+                  <p class="card-text">
+                    {{ message }}
+                  </p>
+                </div>
+                <div class="card-footer text-muted">{{ created_at }}</div>
+              </div>
+            `;
+        }
+        else{
+            `
+                <div class="card text-center" style="float: left; width: fit-content;">
+                <div class="card-header">{{ username }}</div>
+                <div class="card-body">
+                  <p class="card-text">
+                    {{ message }}
+                  </p>
+                </div>
+                <div class="card-footer text-muted">{{ created_at }}</div>
+              </div>
+            `;
+        }
+        const messages_div = document.getElementById('messages');
+        messages_div.insertBefore(newNode, messages_div.firstChild);
+    }
+
+    window.onbeforeunload = function () {
+        socket.emit('leave_room', {
+            username: "{{ username }}",
+            room: "{{ room._id }}"
+        })
+    };
+
+    socket.on('receive_message', function (data) {
+        console.log(data);
+        const newNode = document.createElement('div');
+        if(data.username=="{{current_user.username}}"){
+            newNode.innerHTML =`
+                <div class="card text-center" style="float: right; width: fit-content;">
+                <div class="card-body">
+                  <p class="card-text">
+                    ${data.message}
+                  </p>
+                </div>
+                <div class="card-footer text-muted">${data.created_at}</div>
+              </div>
+            `;
+        }
+        else{
+            newNode.innerHTML =`
+                <div class="card text-center" style="float: left; width: fit-content;">
+                <div class="card-header">${data.username}</div>
+                <div class="card-body">
+                  <p class="card-text">
+                    ${data.message}
+                  </p>
+                </div>
+                <div class="card-footer text-muted">${data.created_at}</div>
+              </div>
+            `;
+        }
+        document.getElementById('messages').appendChild(newNode);
+    });
+
+    socket.on('join_room_announcement', function (data) {
+        console.log(data);
+        if (data.username !== "{{ username }}") {
+            const newNode = document.createElement('div');
+            newNode.innerHTML = `<b>${data.username}</b> has joined the room`;
+            document.getElementById('messages').appendChild(newNode);
+        }
+    });
+
+    socket.on('leave_room_announcement', function (data) {
+        console.log(data);
+        const newNode = document.createElement('div');
+        newNode.innerHTML = `<b>${data.username}</b> has left the room`;
+        document.getElementById('messages').appendChild(newNode);
+    });
+</script>
+{% endblock %}

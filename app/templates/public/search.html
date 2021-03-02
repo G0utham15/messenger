@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for user in users %}
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{user.name}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted" style="margin: 0px;">{{user.username}}</h6>
+                    <a class="btn btn-primary" href="{{url_for('public.request_user', username=user.username)}}" role="button">Add friend</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}   
+    </div>
+{% endblock %}
