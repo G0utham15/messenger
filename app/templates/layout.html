@@ -4,14 +4,14 @@
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/icons/bootstrap-icons.css" rel="stylesheet">
     <script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <link href="/static/css/global.css" rel="stylesheet">
 {% endblock %}
 {% block head %}
 <title>Test</title>
 {% endblock %}
 
 {% block body %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<div id="navbar" style="position: sticky; top:10px; width:100%; overflow:hidden">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" >
   <div class="container">
     <div class="navbar-header">
       <a class="navbar-brand" href="{{ url_for('public.home_page') }}"><span class="glyphicon glyphicon-leaf text-success" aria-hidden="true"></span> {{ config.get('APP_NAME')  }}</a>
@@ -20,8 +20,8 @@
       <div class="input-group">
         <form>
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <input type="text" class="form-control" placeholder="Username" name="username" autocomplete="off">
-          <button type="submit"><img src="/static/icons/person-plus.svg" alt="Bootstrap" width="24" height="24"></button>
+          <input type="text" class="form-control me-2" placeholder="Username" name="username" autocomplete="off">
+          <button class="btn btn-success" type="submit"><img src="/static/icons/person-plus.svg" width="24" height="24"></button>
         </form>
         
       </div>
@@ -45,6 +45,13 @@
               <label>Members:</label>
               <input type="text" name="members" autocomplete="off">
               <br>
+              <label for="type">Type of room</label>
+              <select id="type" name="type">
+                <option value="group">Group</option>
+                <option value="Channel">Channel</option>
+              </select>
+              <br>
+              
               <button type="submit">Submit</button>
             </form>
           </div>
@@ -86,7 +93,11 @@
     </div><!--/.nav-collapse -->
   </div>
 </nav>
+</div>
+<div id="main">
   {% block content %}{% endblock %}
+</div>
+  
 
 {% endblock %}
 

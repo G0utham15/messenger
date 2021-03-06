@@ -60,15 +60,15 @@ def create_room():
     if request.method == 'POST':
         room_name = request.form.get('room_name')
         usernames = [username.strip() for username in request.form.get('members').split(',')]
-
+        type_room=request.form.get('type')
         if len(room_name) and len(usernames):
-            room_id = save_room(room_name, current_user.username)
+            room_id = save_room(room_name, current_user.username, type_room)
             if current_user.username in usernames:
                 usernames.remove(current_user.username)
-            add_room_members(room_id, room_name, usernames, current_user.username)
+            add_room_members(room_id, room_name, usernames, current_user.username, type_room)
             return redirect(url_for('public.view_room', room_id=room_id))
         else:
-            message = "Failed to create room"
+            flash("Failed to create room", 'error')
     #return render_template('chat/create_room.html', message=message)
 
 
@@ -97,7 +97,6 @@ def edit_room(room_id):
         return render_template('chat/edit_room.html', room=room, room_members_str=room_members_str, message=message)
     else:
         return "Room not found", 404
-
 
 @public_blueprint.route('/rooms/<room_id>/')
 @login_required

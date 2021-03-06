@@ -10,11 +10,11 @@ users_collection = chat_db.get_collection("user")
 rooms_collection = chat_db.get_collection("rooms")
 room_members_collection = chat_db.get_collection("room_members")
 messages_collection = chat_db.get_collection("messages")
+user_rooms= chat_db.get_collection("user_rooms")
 
-
-def save_room(room_name, created_by):
+def save_room(room_name, created_by, type='group'):
     room_id = rooms_collection.insert_one(
-        {'name': room_name, 'created_by': created_by, 'created_at': datetime.now(), 'admin':[created_by]}).inserted_id
+        {'name': room_name, 'created_by': created_by, 'created_at': datetime.now(), 'admin':[created_by], 'users':[created_by], 'type':type}).inserted_id
     add_room_member(room_id, room_name, created_by, created_by, is_room_admin=True)
     return room_id
 
@@ -33,10 +33,10 @@ def add_room_member(room_id, room_name, username, added_by, is_room_admin=False)
          'added_at': datetime.now(), 'is_room_admin': is_room_admin})
 
 
-def add_room_members(room_id, room_name, usernames, added_by):
+def add_room_members(room_id, room_name, usernames, added_by, type='group'):
     room_members_collection.insert_many(
         [{'_id': {'room_id': ObjectId(room_id), 'username': username}, 'room_name': room_name, 'added_by': added_by,
-          'added_at': datetime.now(), 'is_room_admin': False} for username in usernames])
+          'added_at': datetime.now(), 'is_room_admin': False, 'type':type} for username in usernames])
 
 
 def remove_room_members(room_id, usernames):
@@ -65,7 +65,7 @@ def save_message(room_id, text, sender):
     messages_collection.insert_one({'room_id': room_id, 'text': text, 'sender': sender, 'created_at': datetime.now()})
 
 
-MESSAGE_FETCH_LIMIT = 3
+MESSAGE_FETCH_LIMIT = 50
 
 
 def get_messages(room_id, page=0):

@@ -1,38 +1,15 @@
-/* Sticky footer styles
- * -------------------------------------------------- */
-
-html {
-    position: relative;
-    min-height: 100%;
+#left {
+    float: left;
+    width: 30%;
+    height: 100%;
+    overflow: scroll;
+    overflow-x: hidden;
 }
 
-body {
-    /* Margin bottom by footer height */
-    margin-bottom: 60px;
-}
-
-.footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    /* Set the fixed height of the footer here */
-    height: 60px;
-    background-color: #f5f5f5;
-}
-
-body>.container {
-    padding: 60px 15px 0;
-}
-
-.container .text-muted {
-    margin: 20px 0;
-}
-
-.footer>.container {
-    padding-right: 15px;
-    padding-left: 15px;
-}
-
-code {
-    font-size: 80%;
+#right {
+    float: right;
+    width: 70%;
+    height: 100%;
+    overflow:auto;
+    overflow-y: hidden;
 }

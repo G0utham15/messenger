@@ -27,8 +27,8 @@
 </div>
 
 <button type="button" id="load_older_messages_btn">Load Older Messages</button>
-<div id="messages">
-    <ul class="list-group">
+<div>
+    <ul class="list-group" id="messages">
         {% for message in messages %}
             {% if message.sender==current_user.username %}
             <li class="list-group-item">
@@ -61,10 +61,12 @@
     </ul>
 </div>
 <div>
+<div id="Message_input">
 <form id="message_input_form">
     <input type="text" id="message_input" placeholder="Enter your message here">
     <button type="submit">Send</button>
 </form>
+</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
 <script>
@@ -110,7 +112,8 @@
     };
 
     function prepend_message(message, username, created_at) {
-        const newNode = document.createElement('div');
+        const newNode = document.createElement('li');
+        newNode.classList="list-group-item";
         if(username=={{current_user.username}}){
             newNode.innerHTML =`
                 <div class="card text-center" style="float: right; width: fit-content;">
@@ -148,8 +151,8 @@
     };
 
     socket.on('receive_message', function (data) {
-        console.log(data);
-        const newNode = document.createElement('div');
+        const newNode = document.createElement('li');
+        newNode.classList="list-group-item";
         if(data.username=="{{current_user.username}}"){
             newNode.innerHTML =`
                 <div class="card text-center" style="float: right; width: fit-content;">
@@ -175,7 +178,8 @@
               </div>
             `;
         }
-        document.getElementById('messages').appendChild(newNode);
+        var node= document.getElementById('messages').appendChild(newNode);
+        node.scrollIntoView();
     });
 
     socket.on('join_room_announcement', function (data) {
