@@ -27,10 +27,10 @@ def get_room(room_id):
     return rooms_collection.find_one({'_id': ObjectId(room_id)})
 
 
-def add_room_member(room_id, room_name, username, added_by, is_room_admin=False):
+def add_room_member(room_id, room_name, username, added_by, is_room_admin=False, type='group'):
     room_members_collection.insert_one(
         {'_id': {'room_id': ObjectId(room_id), 'username': username}, 'room_name': room_name, 'added_by': added_by,
-         'added_at': datetime.now(), 'is_room_admin': is_room_admin})
+         'added_at': datetime.now(), 'is_room_admin': is_room_admin, 'type':type})
 
 
 def add_room_members(room_id, room_name, usernames, added_by, type='group'):

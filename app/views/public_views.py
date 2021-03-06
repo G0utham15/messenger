@@ -28,30 +28,54 @@ def search_user():
 @login_required
 def request_user(username):
     requestUser.insert_one(
-        {'from': current_user.username,'to':username, 'created_at': datetime.now()})
+        {'from': current_user.username, 'from_name':current_user.name,'to':username, 'created_at': datetime.now()})
     flash("Request Sent", 'success')
     return redirect("/")
 
 @public_blueprint.route('/requests', methods=['GET','POST'])
 @login_required
-def requests():
-    Request=request_user.find({'to':current_user.username})
-    return render_template('request.html', users=Request)
+def requests(**kwargs):
+    
+    Request=[requestUser.find_one({'to':current_user.username})]
+    return render_template('public/request.html', users=Request)
+
+@public_blueprint.route('/accept/<username>', methods=['GET', 'POST'])
+@login_required
+def accept(username):
+    type_room='chat'
+    room_name="#"
+    room_id = save_room(room_name, current_user.username, type_room)
+    add_room_member(room_id, room_name, username, current_user.username,False, type_room)
+    addFriend(username, current_user.username)
+    return redirect("/")
+
+def addFriend(user1, user2):
+    if friends.find_one({'_id':user1}):
+        friends.update_one({'_id':user1, '$push':{'friends':user2}})
+    else:
+        friends.insert_one({'_id':user1, 'friends':[user2]})
+    if friends.find_one({'_id':user2}):
+        friends.update_one({'_id':user2, '$push':{'friends':user1}})
+    else:
+        friends.insert_one({'_id':user2, 'friends':[user1]})
+
 
 @public_blueprint.route('/leave/<room_id>', methods=['GET','POST'])
 @login_required
 def leave_room(room_id):
-    room_members_collection.delete_one({'_id.room_id': ObjectId(room_id), '_id.username':current_user.username})
+    if room_members_collection.find_one({'_id.room_id': ObjectId(room_id), '_id.username':current_user.username})['is_room_admin']:
+        room_members_collection.delete_one({'_id.room_id': ObjectId(room_id), '_id.username':current_user.username})
+        rooms_collection.delete_one({'_id':ObjectId(room_id)})
     return redirect("/")
 
-@public_blueprint.route('/accept/<username>', methods=['GET','POST'])
+"""@public_blueprint.route('/accept/<username>', methods=['GET','POST'])
 @login_required
 def accept_user(username):
     friends={"username":current_user.username, "friends":[]}
     request=requestUser.insert_one(
         {'name': current_user.name, 'username': current_user.username, 'created_at': datetime.now()}).inserted_id
     return username
-
+"""
 
 @public_blueprint.route('/create-room', methods=['POST'])
 @login_required

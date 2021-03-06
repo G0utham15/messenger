@@ -1,7 +1,7 @@
 {% extends "public/home_page.html" %}
 {% block message %}
 <div class="card text-dark bg-light">
-    <div class="card-body" style="padding: 0.5rem;">
+    <div class="card-body">
         <div style="float: left;">
             <h5 class="card-title">{{ room.name }}</h5>
             <h6 class="card-subtitle mb-2 text-muted" style="margin: 0px;">
@@ -60,13 +60,11 @@
         
     </ul>
 </div>
-<div>
-<div id="Message_input">
+<div id="Message_input" style="position: fixed; bottom:0px">
 <form id="message_input_form">
     <input type="text" id="message_input" placeholder="Enter your message here">
     <button type="submit">Send</button>
 </form>
-</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
 <script>
@@ -127,8 +125,7 @@
             `;
         }
         else{
-            `
-                <div class="card text-center" style="float: left; width: fit-content;">
+            `<div class="card text-center" style="float: left; width: fit-content;">
                 <div class="card-header">{{ username }}</div>
                 <div class="card-body">
                   <p class="card-text">
@@ -162,8 +159,7 @@
                   </p>
                 </div>
                 <div class="card-footer text-muted">${data.created_at}</div>
-              </div>
-            `;
+              </div>`;
         }
         else{
             newNode.innerHTML =`

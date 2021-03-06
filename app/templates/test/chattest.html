@@ -18,8 +18,7 @@
 
 				<!-- Navbar -->
 				<div class="row d-flex flex-row align-items-center p-2" id="navbar">
-					<img alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; cursor:pointer;" onclick="showProfileSettings()" id="display-pic">
-					<div class="text-white font-weight-bold" id="username"></div>
+					<div class="btn text-white font-weight-bold" id="username" onclick="showProfileSettings()" id="display-pic"></div>
 					<div class="nav-item dropdown ml-auto">
 						<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v text-white"></i></a>
 						<div class="dropdown-menu dropdown-menu-right">
@@ -42,8 +41,6 @@
 						<div class="text-white font-weight-bold">Profile</div>
 					</div>
 					<div class="d-flex flex-column" style="overflow:auto;">
-						<img alt="Profile Photo" class="img-fluid rounded-circle my-5 justify-self-center mx-auto" id="profile-pic">
-						<input type="file" id="profile-pic-input" class="d-none">
 						<div class="bg-white px-3 py-2">
 							<div class="text-muted mb-2"><label for="input-name">Your Name</label></div>
 							<input type="text" name="name" id="input-name" class="w-100 border-0 py-2 profile-input">
