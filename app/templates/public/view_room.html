@@ -1,71 +1,85 @@
 {% extends "public/home_page.html" %}
 {% block message %}
-<div class="card text-dark bg-light">
-    <div class="card-body">
-        <div style="float: left;">
-            <h5 class="card-title">{{ room.name }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted" style="margin: 0px;">
-                {% for i in roomMembers %}
-                {% if i!=current_user.username %}
-                {{i}}
-                {% endif %}
-                {% endfor %}
-            </h6>
-        </div>
-        <div class="dropdown fs-2" style="float: right; ">
-            <button class="btn" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="/static/icons/three-dots-vertical.svg">
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><a class="dropdown-item btn btn-danger" href="{{url_for('public.leave_room', room_id=room._id)}}">Leave Room</a></li>
-            </ul>
-          </div>
-          
+<div class="row d-flex flex-row align-items-center p-2 m-0 w-100" id="navbar" style="background:#a4adca; justify-content: space-between;">
+    <div class="d-flex flex-column" style="width: fit-content;">
+        {% if room.type=='chat' %}
+            <div class="text-white font-weight-bold" id="name">{{roomMembers[0]}}</div>
+            <div class="text-white small" id="details">
+                
+            </div>
+        {% else %}
+            <div class="text-white font-weight-bold" id="name">{{ room.name }}</div>
+            <div class="text-white small" id="details">
+                {{roomMembers}}
+            </div>
+        {% endif %}
+    </div>
+    <div class="d-flex flex-row align-items-center ml-auto" style="width: fit-content;">
+        <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><img src="/static/icons/three-dots-vertical.svg"></a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><a class="dropdown-item btn btn-danger" href="{{url_for('public.leave_room', room_id=room._id)}}">Leave Room</a></li>
+        </ul>
     </div>
 </div>
 
-<button type="button" id="load_older_messages_btn">Load Older Messages</button>
+
+
 <div>
-    <ul class="list-group" id="messages">
+    <button type="button" id="load_older_messages_btn">Load Older Messages</button>
+        <ul class="list-group">
         {% for message in messages %}
+            <li class="list-group-item">
             {% if message.sender==current_user.username %}
-            <li class="list-group-item">
-                <div class="col card text-center" style="float: right; width: fit-content;">
-                    <div class="card-body">
-                    <p class="card-text">
-                        {{ message.text }}
-                    </p>
+                <div class="align-self-end self p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float: right; width: fit-content;">
+                    <div class="options">
+                        <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
                     </div>
-                    <div class="card-footer text-muted">{{ message.created_at }}</div>
-                </div>
-                
-            </li>
-            {% else %}
-            <li class="list-group-item">
-                <div class="col card text-center" style="float: left; width: fit-content;">
-                    <div class="card-header">{{ message.sender }}</div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                {{ message.text }}
-                            </p>
+                    
+                    <div class="d-flex flex-row">
+                        <div class="body m-1 mr-2">{{ message.text }}</div>
+                        <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" style="width:75px;">
+                            {{ message.created_at }}
                         </div>
-                        <div class="card-footer text-muted">{{ message.created_at }}</div>
+                    </div>
                 </div>
-            </li>
-            
+            {% else %}
+                <div class="align-self-start p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float: left; width: fit-content;">
+                    <div class="options">
+                        <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
+                    </div>
+                    <div class="small font-weight-bold text-primary">
+                        {{message.sender}}
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="body m-1 mr-2">{{ message.text }}</div>
+                        <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" style="width:75px;">
+                            {{ message.created_at }}
+                        </div>
+                    </div>
+                </div>
             {% endif %}
+            </li>
         {% endfor %}
-        
+        <div class="d-flex flex-column" id="messages"></div>
     </ul>
+        <!-- <ul class="list-group" id="messages"></ul> -->
+        <!-- <div class="d-flex flex-column" id="messages"></div> -->
 </div>
-<div id="Message_input" style="position: fixed; bottom:0px">
-<form id="message_input_form">
-    <input type="text" id="message_input" placeholder="Enter your message here">
-    <button type="submit">Send</button>
-</form>
+<div class="justify-self-end align-items-center flex-row" style="position: fixed; bottom: 0px; width: 100%; background-color:azure">
+    <form id="message_input_form">
+        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input" placeholder="Enter your message here">
+        <button class="text-muted px-3" type="submit">Send</button>
+    </form>
 </div>
+<!-- <div class="d-none justify-self-end align-items-center flex-row" id="input-area">
+    <a href="#"><i class="far fa-smile text-muted px-3" style="font-size:1.5rem;"></i></a>
+    <form id="message_input_form">
+        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input" placeholder="Enter your message here">
+        <button class="text-muted px-3" type="submit">Send</button>
+    </form>
+</div> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
 <script>
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
@@ -112,30 +126,22 @@
     function prepend_message(message, username, created_at) {
         const newNode = document.createElement('li');
         newNode.classList="list-group-item";
-        if(username=={{current_user.username}}){
-            newNode.innerHTML =`
-                <div class="card text-center" style="float: right; width: fit-content;">
-                <div class="card-body">
-                  <p class="card-text">
-                    {{ message }}
-                  </p>
+        newNode.innerHTML = `
+        <div class="align-self-${data.username === "{{current_user.username}}" ? "end self" : "start"} p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float:${data.username === "{{current_user.username}}" ? "right" : "left"} ; width: fit-content;">
+            <div class="options">
+                <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
+            </div>
+            <div class="small font-weight-bold text-primary">
+                ${data.username}
+            </div>
+            <div class="d-flex flex-row">
+                <div class="body m-1 mr-2">${data.message}</div>
+                <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" style="width:75px;">
+                    ${data.created_at}
                 </div>
-                <div class="card-footer text-muted">{{ created_at }}</div>
-              </div>
-            `;
-        }
-        else{
-            `<div class="card text-center" style="float: left; width: fit-content;">
-                <div class="card-header">{{ username }}</div>
-                <div class="card-body">
-                  <p class="card-text">
-                    {{ message }}
-                  </p>
-                </div>
-                <div class="card-footer text-muted">{{ created_at }}</div>
-              </div>
-            `;
-        }
+            </div>
+        </div>
+        `;
         const messages_div = document.getElementById('messages');
         messages_div.insertBefore(newNode, messages_div.firstChild);
     }
@@ -150,31 +156,25 @@
     socket.on('receive_message', function (data) {
         const newNode = document.createElement('li');
         newNode.classList="list-group-item";
-        if(data.username=="{{current_user.username}}"){
-            newNode.innerHTML =`
-                <div class="card text-center" style="float: right; width: fit-content;">
-                <div class="card-body">
-                  <p class="card-text">
-                    ${data.message}
-                  </p>
+        newNode.innerHTML = `
+        <div class="align-self-${data.username === "{{current_user.username}}" ? "end self" : "start"} p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float:${data.username === "{{current_user.username}}" ? "right" : "left"} ; width: fit-content;">
+            <div class="options">
+                <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
+            </div>
+            <div class="small font-weight-bold text-primary">
+                ${data.username}
+            </div>
+            <div class="d-flex flex-row">
+                <div class="body m-1 mr-2">${data.message}</div>
+                <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" style="width:75px;">
+                    ${data.created_at}
                 </div>
-                <div class="card-footer text-muted">${data.created_at}</div>
-              </div>`;
-        }
-        else{
-            newNode.innerHTML =`
-                <div class="card text-center" style="float: left; width: fit-content;">
-                <div class="card-header">${data.username}</div>
-                <div class="card-body">
-                  <p class="card-text">
-                    ${data.message}
-                  </p>
-                </div>
-                <div class="card-footer text-muted">${data.created_at}</div>
-              </div>
-            `;
-        }
+            </div>
+        </div>
+        `;
+
         var node= document.getElementById('messages').appendChild(newNode);
+        document.getById("messages")
         node.scrollIntoView();
     });
 

@@ -15,7 +15,7 @@ user_rooms= chat_db.get_collection("user_rooms")
 def save_room(room_name, created_by, type='group'):
     room_id = rooms_collection.insert_one(
         {'name': room_name, 'created_by': created_by, 'created_at': datetime.now(), 'admin':[created_by], 'users':[created_by], 'type':type}).inserted_id
-    add_room_member(room_id, room_name, created_by, created_by, is_room_admin=True)
+    add_room_member(room_id, room_name, created_by, created_by,  True, type)
     return room_id
 
 def update_room(room_id, room_name):

@@ -44,18 +44,18 @@ def requests(**kwargs):
 def accept(username):
     type_room='chat'
     room_name="#"
-    room_id = save_room(room_name, current_user.username, type_room)
-    add_room_member(room_id, room_name, username, current_user.username,False, type_room)
+    room_id = save_room(room_name, current_user.username, 'chat')
+    add_room_member(room_id, room_name, username, current_user.username,True, 'chat')
     addFriend(username, current_user.username)
     return redirect("/")
 
 def addFriend(user1, user2):
     if friends.find_one({'_id':user1}):
-        friends.update_one({'_id':user1, '$push':{'friends':user2}})
+        friends.update_one({'_id':user1}, {'$push':{'friends':[user2]}})
     else:
         friends.insert_one({'_id':user1, 'friends':[user2]})
     if friends.find_one({'_id':user2}):
-        friends.update_one({'_id':user2, '$push':{'friends':user1}})
+        friends.update_one({'_id':user2}, {'$push':{'friends':[user1]}})
     else:
         friends.insert_one({'_id':user2, 'friends':[user1]})
 
@@ -130,7 +130,7 @@ def view_room(room_id):
     if room and is_room_member(room_id, current_user.username):
         room_members = get_room_members(room_id)
         messages = get_messages(room_id)
-        roomMembers=[i["_id"]["username"] for i in room_members]
+        roomMembers=[i["_id"]["username"] for i in room_members if i["_id"]["username"]!=current_user.username]
         return render_template('public/view_room.html',rooms=rooms, username=current_user.username, room=room, room_members=room_members,
                                messages=messages, roomMembers=roomMembers)
     else:

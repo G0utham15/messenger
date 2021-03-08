@@ -260,6 +260,8 @@ window.addEventListener("resize", e => {
 
 let init = () => {
 	DOM.username.innerHTML = user.name;
+	DOM.displayPic.src = user.pic;
+	DOM.profilePic.stc = user.pic;
 	DOM.profilePic.addEventListener("click", () => DOM.profilePicInput.click());
 	DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
 	DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
