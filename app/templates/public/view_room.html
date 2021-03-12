@@ -12,23 +12,22 @@
             <div class="text-white small" id="details">
                 {{roomMembers}}
             </div>
+            
         {% endif %}
     </div>
     <div class="d-flex flex-row align-items-center ml-auto" style="width: fit-content;">
         <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><img src="/static/icons/three-dots-vertical.svg"></a>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="{{url_for('public.roomSummery', room_id=room._id)}}">Export Chat</a></li>
             <li><a class="dropdown-item" href="#">Another action</a></li>
             <li><a class="dropdown-item btn btn-danger" href="{{url_for('public.leave_room', room_id=room._id)}}">Leave Room</a></li>
         </ul>
     </div>
 </div>
 
-
-
 <div>
-    <button type="button" id="load_older_messages_btn">Load Older Messages</button>
-        <ul class="list-group">
+    <ul class="list-group">
+        <!-- <button type="button" id="load_older_messages_btn">Load Older Messages</button> -->
         {% for message in messages %}
             <li class="list-group-item">
             {% if message.sender==current_user.username %}
@@ -64,15 +63,24 @@
         {% endfor %}
         <div class="d-flex flex-column" id="messages"></div>
     </ul>
-        <!-- <ul class="list-group" id="messages"></ul> -->
-        <!-- <div class="d-flex flex-column" id="messages"></div> -->
 </div>
+{% if room.type!='Channel' or room.type=='Channel' and current_user.username in room.admin %}
 <div class="justify-self-end align-items-center flex-row" style="position: fixed; bottom: 0px; width: 100%; background-color:azure">
     <form id="message_input_form">
-        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input" placeholder="Enter your message here">
+        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input" placeholder="Enter your message here" autocomplete="off" style="width: 60%;padding-left:10px">
         <button class="text-muted px-3" type="submit">Send</button>
     </form>
 </div>
+{% else %}
+<div class="justify-self-end align-items-center flex-row" style="position: fixed; bottom: 0px; width: 100%; background-color:azure">
+    <form id="message_input_form">
+        <fieldset disabled>
+        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input" placeholder="You don't have permission to send">
+        <button class="text-muted px-3" type="submit">Send</button>
+    </fieldset>
+    </form>
+</div>
+{% endif %}
 <!-- <div class="d-none justify-self-end align-items-center flex-row" id="input-area">
     <a href="#"><i class="far fa-smile text-muted px-3" style="font-size:1.5rem;"></i></a>
     <form id="message_input_form">
@@ -80,7 +88,7 @@
         <button class="text-muted px-3" type="submit">Send</button>
     </form>
 </div> -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
+<script src="/static/js/socketio.js"></script>
 <script>
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
@@ -91,7 +99,7 @@
         });
 
         let message_input = document.getElementById('message_input');
-        
+        console.log("{{room}}");
         document.getElementById('message_input_form').onsubmit = function (e) {
             e.preventDefault();
             let message = message_input.value.trim();
@@ -107,7 +115,8 @@
         }
     });
 
-    let page = 0;
+    /*
+        let page = 0;
 
     document.getElementById("load_older_messages_btn").onclick = (e) => {
         page += 1;
@@ -144,8 +153,8 @@
         `;
         const messages_div = document.getElementById('messages');
         messages_div.insertBefore(newNode, messages_div.firstChild);
-    }
-
+    } 
+    */
     window.onbeforeunload = function () {
         socket.emit('leave_room', {
             username: "{{ username }}",
@@ -174,8 +183,8 @@
         `;
 
         var node= document.getElementById('messages').appendChild(newNode);
-        document.getById("messages")
-        node.scrollIntoView();
+        window.scrollTo(0,document.getById("messages").scrollHeight);
+        //node.scrollIntoView();
     });
 
     socket.on('join_room_announcement', function (data) {

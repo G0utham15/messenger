@@ -31,6 +31,7 @@ def add_room_member(room_id, room_name, username, added_by, is_room_admin=False,
     room_members_collection.insert_one(
         {'_id': {'room_id': ObjectId(room_id), 'username': username}, 'room_name': room_name, 'added_by': added_by,
          'added_at': datetime.now(), 'is_room_admin': is_room_admin, 'type':type})
+    rooms_collection.update_one({'_id': ObjectId(room_id)}, {'$push': {'users': username}})
 
 
 def add_room_members(room_id, room_name, usernames, added_by, type='group'):
@@ -68,10 +69,14 @@ def save_message(room_id, text, sender):
 MESSAGE_FETCH_LIMIT = 50
 
 
-def get_messages(room_id, page=0):
-    offset = page * MESSAGE_FETCH_LIMIT
+def get_messages(room_id):
+    #offset = page * MESSAGE_FETCH_LIMIT
+    messages = list(
+        messages_collection.find({'room_id': room_id}).sort('_id', DESCENDING))
+    """
     messages = list(
         messages_collection.find({'room_id': room_id}).sort('_id', DESCENDING).limit(MESSAGE_FETCH_LIMIT).skip(offset))
+    """
     for message in messages:
-        message['created_at'] = message['created_at'].strftime("%d %b, %H:%M")
+        message['created_at'] = message['created_at'].strftime("%d %b %y, %H:%M")
     return messages[::-1]

@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, render_template, flash, send_file
 from flask import redirect, request, render_template, url_for
 from flask_security import login_required, current_user
 from bson.json_util import dumps
+import os
 from bson import ObjectId
 from flask_socketio import SocketIO
 from db import *
@@ -14,7 +15,8 @@ friends=chat_db.get_collection("friends")
 @public_blueprint.route('/')
 def home_page():
     rooms = get_rooms_for_user(current_user.username)
-    return render_template('public/home_page.html',rooms=rooms)
+    friend=friends.find_one({'_id':current_user.username})
+    return render_template('public/home_page.html',rooms=rooms, friend=friend)
 
 @public_blueprint.route('/search', methods=['POST'])
 @login_required
@@ -42,7 +44,6 @@ def requests(**kwargs):
 @public_blueprint.route('/accept/<username>', methods=['GET', 'POST'])
 @login_required
 def accept(username):
-    type_room='chat'
     room_name="#"
     room_id = save_room(room_name, current_user.username, 'chat')
     add_room_member(room_id, room_name, username, current_user.username,True, 'chat')
@@ -51,11 +52,11 @@ def accept(username):
 
 def addFriend(user1, user2):
     if friends.find_one({'_id':user1}):
-        friends.update_one({'_id':user1}, {'$push':{'friends':[user2]}})
+        friends.update_one({'_id':user1}, {'$push':{'friends':user2}})
     else:
         friends.insert_one({'_id':user1, 'friends':[user2]})
     if friends.find_one({'_id':user2}):
-        friends.update_one({'_id':user2}, {'$push':{'friends':[user1]}})
+        friends.update_one({'_id':user2}, {'$push':{'friends':user1}})
     else:
         friends.insert_one({'_id':user2, 'friends':[user1]})
 
@@ -83,7 +84,7 @@ def create_room():
     message = ''
     if request.method == 'POST':
         room_name = request.form.get('room_name')
-        usernames = [username.strip() for username in request.form.get('members').split(',')]
+        usernames = request.form.getlist('friends')
         type_room=request.form.get('type')
         if len(room_name) and len(usernames):
             room_id = save_room(room_name, current_user.username, type_room)
@@ -126,13 +127,14 @@ def edit_room(room_id):
 @login_required
 def view_room(room_id):
     room = get_room(room_id)
+    friend=friends.find_one({'_id':current_user.username})
     rooms = get_rooms_for_user(current_user.username)
     if room and is_room_member(room_id, current_user.username):
         room_members = get_room_members(room_id)
         messages = get_messages(room_id)
         roomMembers=[i["_id"]["username"] for i in room_members if i["_id"]["username"]!=current_user.username]
         return render_template('public/view_room.html',rooms=rooms, username=current_user.username, room=room, room_members=room_members,
-                               messages=messages, roomMembers=roomMembers)
+                               messages=messages, roomMembers=roomMembers, friend=friend)
     else:
         return "Room not found", 404
 
@@ -142,8 +144,39 @@ def view_room(room_id):
 def get_older_messages(room_id):
     room = get_room(room_id)
     if room and is_room_member(room_id, current_user.username):
-        page = int(request.args.get('page', 0))
-        messages = get_messages(room_id, page)
+        messages = get_messages(room_id)
         return dumps(messages)
     else:
         return "Room not found", 404
+
+@public_blueprint.route('/userSummery')
+@login_required
+def userSummery():
+    rooms = get_rooms_for_user(current_user.username)
+    for i in rooms:
+        room_id=i['_id']['room_id']
+        room = get_room(room_id)
+        if room and is_room_member(room_id, current_user.username):
+            createFolder("user")
+            messages = get_messages(room_id)
+            with open("user/userSummery.txt","a+") as file:
+                file.write(dumps(messages))
+    return send_file(os.path.realpath("D:\\Projects\\messenger\\user\\userSummery.txt"), as_attachment=True)
+
+@public_blueprint.route('/roomSummery/<room_id>')
+@login_required
+def roomSummery(room_id):
+    room = get_room(room_id)
+    if room and is_room_member(room_id, current_user.username):
+        createFolder("room")
+        messages = get_messages(room_id)
+        with open("room/roomSummery.txt","w+") as file:
+            file.write(dumps(messages))
+        return send_file(os.path.realpath("D:\\Projects\\messenger\\room\\roomSummery.txt"), as_attachment=True)
+
+def createFolder(directory):
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    except OSError:
+        print ('Error: Creating directory. ' +  directory)
