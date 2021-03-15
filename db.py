@@ -11,6 +11,8 @@ rooms_collection = chat_db.get_collection("rooms")
 room_members_collection = chat_db.get_collection("room_members")
 messages_collection = chat_db.get_collection("messages")
 user_rooms= chat_db.get_collection("user_rooms")
+group_transactions=chat_db.get_collection("groupTransactions")
+transaction_message=chat_db.get_collection("transactionMessage")
 
 def save_room(room_name, created_by, type='group'):
     room_id = rooms_collection.insert_one(
@@ -62,21 +64,33 @@ def is_room_admin(room_id, username):
         {'_id': {'room_id': ObjectId(room_id), 'username': username}, 'is_room_admin': True})
 
 
-def save_message(room_id, text, sender):
-    messages_collection.insert_one({'room_id': room_id, 'text': text, 'sender': sender, 'created_at': datetime.now()})
+def save_message(room_id, text, sender, type):
+    if type=='chat':
+        messages_collection.insert_one({'room_id': room_id, 'text': text, 'sender': sender, 'created_at': datetime.now()})
+    else:
+        link=group_transactions.insert_one({'room_id':room_id, 'sender': sender, 'created_at': datetime.now()}).inserted_id
+        transaction_message.insert_one({'id': link, 'text': text})
 
 
 MESSAGE_FETCH_LIMIT = 50
 
 
-def get_messages(room_id):
+def get_messages(room_id, type):
     #offset = page * MESSAGE_FETCH_LIMIT
-    messages = list(
-        messages_collection.find({'room_id': room_id}).sort('_id', DESCENDING))
+    if type=='chat':
+        messages = list(messages_collection.find({'room_id': room_id}).sort('_id', DESCENDING))
+        for message in messages:
+            message['date']=message['created_at'].strftime("%d-%m-%y")
+            message['created_at'] = message['created_at'].strftime("%H:%M")
+    else:
+        messages = list(group_transactions.find({'room_id': room_id}).sort('_id', DESCENDING))
+        for message in messages:
+            message['text']=list(transaction_message.find({'id':message['_id']}))[0]['text']
+            message['date']=message['created_at'].strftime("%d-%m-%y")
+            message['created_at'] = message['created_at'].strftime("%H:%M")
     """
     messages = list(
         messages_collection.find({'room_id': room_id}).sort('_id', DESCENDING).limit(MESSAGE_FETCH_LIMIT).skip(offset))
     """
-    for message in messages:
-        message['created_at'] = message['created_at'].strftime("%d %b %y, %H:%M")
+
     return messages[::-1]

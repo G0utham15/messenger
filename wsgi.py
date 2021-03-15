@@ -15,7 +15,7 @@ def handle_send_message_event(data):
                                                                     data['room'],
                                                                     data['message']))
     data['created_at'] = datetime.now().strftime("%d %b, %H:%M")
-    save_message(data['room'], data['message'], data['username'])
+    save_message(data['room'], data['message'], data['username'], data['roomType'])
     socketio.emit('receive_message', data, room=data['room'])
 
 
@@ -33,4 +33,4 @@ def handle_leave_room_event(data):
     socketio.emit('leave_room_announcement', data, room=data['room'])
 
 if __name__=="__main__":
-    socketio.run(app)
+    socketio.run(app, debug=True)

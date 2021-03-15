@@ -30,7 +30,11 @@
         <!-- <button type="button" id="load_older_messages_btn">Load Older Messages</button> -->
         {% for message in messages %}
             <li class="list-group-item">
+                <div>
+                    {{message.date}}
+                </div>
             {% if message.sender==current_user.username %}
+            
                 <div class="align-self-end self p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float: right; width: fit-content;">
                     <div class="options">
                         <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
@@ -107,6 +111,7 @@
                 socket.emit('send_message', {
                     username: "{{ username }}",
                     room: "{{ room._id }}",
+                    roomType:"{{ room.type }}",
                     message: message
                 })
             }

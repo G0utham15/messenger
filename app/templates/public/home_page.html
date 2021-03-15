@@ -36,6 +36,7 @@
             <input type="text" name="room_name" autocomplete="off" id="roomname">
             </div>
             <br>
+            <label for="roomname" class="form-label">Friends</label>
             {% for i in friend.friends %}
             <div class="form-check">
               <input class="form-check-input" type="checkbox" value="{{i}}" id="flexCheckDefault" name="friends">
@@ -62,6 +63,7 @@
           <img src="/static/icons/three-dots-vertical.svg">
         </a>
         <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="navbarDarkDropdownMenuLink">
+          <li><a href="{{ url_for('public.userSummery') }}" class="dropdown-item"><span class="glyphicon glyphicon-user"></span>Export Chat</a></li>
           <li><a href="{{ url_for('members.member_page') }}" class="dropdown-item"><span class="glyphicon glyphicon-user"></span> About</a></li>
           <li><a href="{{ url_for('security.logout') }}" class="dropdown-item "><span class="glyphicon glyphicon-user"></span> {{ _('Logout') }}</a></li>
         </ul>
@@ -74,15 +76,10 @@
         {% for room in rooms %}
         <li class="list-group-item">
         <div class="card border-light">
-          {% if room.type!='chat' %}
           <div class="card-body">
-            <a href="{{url_for('public.view_room', room_id= room._id.room_id)}}">{{ room.room_name }}</a>
+            <a href="{{url_for('public.view_room', room_id= room._id.room_id)}}">{{ room_title[room["_id"]["room_id"]][0] }}</a>
+            <p class="card-text"><small class="text-muted">{{room_title[room["_id"]["room_id"]][1]}}</small></p>
           </div>
-          {% else %}
-          <div class="card-body">
-            <a href="{{url_for('public.view_room', room_id= room._id.room_id)}}">{{roomMembers[0]}}</a>
-          </div>
-          {% endif %}
         </div>
       </li>
         {% endfor %}
