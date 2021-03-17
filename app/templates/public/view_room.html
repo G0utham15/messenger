@@ -4,9 +4,7 @@
     <div class="d-flex flex-column" style="width: fit-content;">
         {% if room.type=='chat' %}
             <div class="text-white font-weight-bold" id="name">{{roomMembers[0]}}</div>
-            <div class="text-white small" id="details">
-                
-            </div>
+            <div class="text-white small" id="status"></div>
         {% else %}
             <div class="text-white font-weight-bold" id="name">{{ room.name }}</div>
             <div class="text-white small" id="details">
@@ -76,14 +74,13 @@
     </form>
 </div>
 {% else %}
+<fieldset disabled>
 <div class="justify-self-end align-items-center flex-row" style="position: fixed; bottom: 0px; width: 100%; background-color:azure">
     <form id="message_input_form">
-        <fieldset disabled>
-        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input" placeholder="You don't have permission to send">
-        <button class="text-muted px-3" type="submit">Send</button>
-    </fieldset>
+        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input" placeholder="You don't have permission to send" style="width: 60%;padding-left:10px">
     </form>
 </div>
+</fieldset>
 {% endif %}
 <!-- <div class="d-none justify-self-end align-items-center flex-row" id="input-area">
     <a href="#"><i class="far fa-smile text-muted px-3" style="font-size:1.5rem;"></i></a>
@@ -103,7 +100,6 @@
         });
 
         let message_input = document.getElementById('message_input');
-        console.log("{{room}}");
         document.getElementById('message_input_form').onsubmit = function (e) {
             e.preventDefault();
             let message = message_input.value.trim();
@@ -170,7 +166,8 @@
     socket.on('receive_message', function (data) {
         const newNode = document.createElement('li');
         newNode.classList="list-group-item";
-        newNode.innerHTML = `
+        if(data.username !=='{{current_user.username}}'){
+            newNode.innerHTML = `
         <div class="align-self-${data.username === "{{current_user.username}}" ? "end self" : "start"} p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float:${data.username === "{{current_user.username}}" ? "right" : "left"} ; width: fit-content;">
             <div class="options">
                 <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
@@ -186,26 +183,39 @@
             </div>
         </div>
         `;
+        }
+        else{
+            newNode.innerHTML = `
+        <div class="align-self-${data.username === "{{current_user.username}}" ? "end self" : "start"} p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float:${data.username === "{{current_user.username}}" ? "right" : "left"} ; width: fit-content;">
+            <div class="options">
+                <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
+            </div>
+            <div class="d-flex flex-row">
+                <div class="body m-1 mr-2">${data.message}</div>
+                <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" style="width:75px;">
+                    ${data.created_at}
+                </div>
+            </div>
+        </div>
+        `;
+        }
+        
 
         var node= document.getElementById('messages').appendChild(newNode);
-        window.scrollTo(0,document.getById("messages").scrollHeight);
+        window.scrollTo(0,document.getElementById("messages").scrollHeight);
         //node.scrollIntoView();
     });
 
     socket.on('join_room_announcement', function (data) {
-        console.log(data);
         if (data.username !== "{{ username }}") {
-            const newNode = document.createElement('div');
-            newNode.innerHTML = `<b>${data.username}</b> has joined the room`;
-            document.getElementById('messages').appendChild(newNode);
+            const status=document.getElementById('status');
+            status.innerHTML = `<h6>Online</h6>`;
         }
     });
 
     socket.on('leave_room_announcement', function (data) {
-        console.log(data);
-        const newNode = document.createElement('div');
-        newNode.innerHTML = `<b>${data.username}</b> has left the room`;
-        document.getElementById('messages').appendChild(newNode);
+        const status=document.getElementById('status');
+        status.innerHTML = `<h6>Last seen at: </h6>`;
     });
 </script>
 {% endblock %}

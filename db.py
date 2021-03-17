@@ -72,9 +72,14 @@ def save_message(room_id, text, sender, type):
         transaction_message.insert_one({'id': link, 'text': text})
 
 
-MESSAGE_FETCH_LIMIT = 50
+#MESSAGE_FETCH_LIMIT = 50
 
-
+def get_last_message(room_id, type):
+    if get_messages(room_id, type).__len__!=0:
+        return get_messages(room_id, type)[-1]
+    else:
+        return ""
+        
 def get_messages(room_id, type):
     #offset = page * MESSAGE_FETCH_LIMIT
     if type=='chat':
