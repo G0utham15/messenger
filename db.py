@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import hashlib
 from bson import ObjectId
 from pymongo import MongoClient, DESCENDING
 
@@ -68,9 +68,11 @@ def save_message(room_id, text, sender, type):
     if type=='chat':
         messages_collection.insert_one({'room_id': room_id, 'text': text, 'sender': sender, 'created_at': datetime.now()})
     else:
-        link=group_transactions.insert_one({'room_id':room_id, 'sender': sender, 'created_at': datetime.now()}).inserted_id
-        transaction_message.insert_one({'id': link, 'text': text})
-
+        group_transactions.insert_one({'room_id':room_id, 'sender': sender,'body': hashlib.md5(text.encode()).hexdigest(), 'created_at': datetime.now()})
+        try:
+            transaction_message.insert_one({'_id': hashlib.md5(text.encode()).hexdigest(), 'text': text})
+        except:
+            pass
 
 #MESSAGE_FETCH_LIMIT = 50
 
@@ -89,10 +91,11 @@ def get_messages(room_id, type):
             message['created_at'] = message['created_at'].strftime("%H:%M")
     else:
         messages = list(group_transactions.find({'room_id': room_id}).sort('_id', DESCENDING))
-        for message in messages:
-            message['text']=list(transaction_message.find({'id':message['_id']}))[0]['text']
-            message['date']=message['created_at'].strftime("%d-%m-%y")
-            message['created_at'] = message['created_at'].strftime("%H:%M")
+        if messages.__len__!=0:
+            for message in messages:
+                message['text']=list(transaction_message.find({'_id':message['body']}))[0]['text']
+                message['date']=message['created_at'].strftime("%d-%m-%y")
+                message['created_at'] = message['created_at'].strftime("%H:%M")
     """
     messages = list(
         messages_collection.find({'room_id': room_id}).sort('_id', DESCENDING).limit(MESSAGE_FETCH_LIMIT).skip(offset))
