@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 {% block style %}
-    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/icons/bootstrap-icons.css" rel="stylesheet">
-    <script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <link href="/static/css/chat_style.css" rel="stylesheet">
+<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/icons/bootstrap-icons.css" rel="stylesheet">
+<script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>
+<link href="/static/css/chat_style.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/chat.css">
 {% endblock %}
 {% block head %}
 <title>Test</title>
 {% endblock %}
 
 {% block body %}
-<div class="col-12 col-sm-5 col-md-4 d-flex flex-column" id="chat-list-area" style="position:relative; float: left;">
+<div class="col-12 col-sm-5 col-md-4 d-flex flex-column" id="sidebar" style="position:relative; float: left;">
   <nav class="navbar navbar-expand-lg navbar-light" style="background:#a4adca;">
     <div class="navbar-header" style="padding-left: 1rem;">
-      <a class="navbar-brand" href="{{ url_for('public.home_page') }}">{{ config.get('APP_NAME')  }}</a>
+      <a class="navbar-brand" href="{{ url_for('public.home_page') }}">{{ config.get('APP_NAME') }}</a>
     </div>
 
     <ul class="nav navbar-nav" style="margin-left: auto!important;">
@@ -21,19 +22,22 @@
         <form class="form" method="POST" action="{{url_for('public.search_user')}}">
           <div class="input-group">
             <form>
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-              <input type="text" class="form-control me-2" placeholder="Username" name="username" autocomplete="off" required>
-              <button class="btn btn-primary" type="submit"><img src="/static/icons/search.svg" width="24" height="24"></button>
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="text" class="form-control me-2" placeholder="Username" name="username" autocomplete="off"
+                required>
+              <button class="btn btn-primary" type="submit"><img src="/static/icons/search.svg" width="24"
+                  height="24"></button>
             </form>
       </li>
       <li class="nav-item dropdown">
-        <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false" href="{{url_for('public.requests')}}"><img src="/static/icons/people-fill.svg"></a>
+        <a class="nav-link" data-bs-toggle="dropdown" aria-expanded="false" href="{{url_for('public.requests')}}"><img
+            src="/static/icons/people-fill.svg"></a>
         <div class="dropdown-menu">
           <form class="form" action="{{url_for('public.create_room')}}" method="POST" style="padding: 10px;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <div class="mb-3">
-            <label for="roomname" class="form-label">Room Name</label>
-            <input type="text" name="room_name" autocomplete="off" id="roomname">
+              <label for="roomname" class="form-label">Room Name</label>
+              <input type="text" name="room_name" autocomplete="off" id="roomname">
             </div>
             <br>
             <label for="roomname" class="form-label">Friends</label>
@@ -59,42 +63,46 @@
         <a class="nav-link" href="{{url_for('public.requests')}}"><img src="/static/icons/person-plus.svg"></a>
       </li>
       <li class="nav-item dropdown">
-        <a class="nav-link" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <a class="nav-link" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
           <img src="/static/icons/three-dots-vertical.svg">
         </a>
         <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="navbarDarkDropdownMenuLink">
-          <li><a href="{{ url_for('public.userSummery') }}" class="dropdown-item"><span class="glyphicon glyphicon-user"></span>Export Chat</a></li>
-          <li><a href="{{ url_for('members.member_page') }}" class="dropdown-item"><span class="glyphicon glyphicon-user"></span> About</a></li>
-          <li><a href="{{ url_for('security.logout') }}" class="dropdown-item "><span class="glyphicon glyphicon-user"></span> {{ _('Logout') }}</a></li>
+          <li><a href="{{ url_for('public.userSummery') }}" class="dropdown-item"><span
+                class="glyphicon glyphicon-user"></span>Export Chat</a></li>
+          <li><a href="{{ url_for('members.member_page') }}" class="dropdown-item"><span
+                class="glyphicon glyphicon-user"></span> About</a></li>
+          <li><a href="{{ url_for('security.logout') }}" class="dropdown-item "><span
+                class="glyphicon glyphicon-user"></span> {{ _('Logout') }}</a></li>
         </ul>
       </li>
     </ul>
   </nav>
   <nav class="bg-light sidebar">
-        {% if current_user.is_authenticated %}
-        <ul class="list-group list-group-flush">
-        {% for room in rooms %}
-        <li class="list-group-item">
+    {% if current_user.is_authenticated %}
+    <ul class="list-group list-group-flush">
+      {% for room in rooms %}
+      <li class="list-group-item">
         <div class="card border-light">
           <div class="card-body">
-            <a href="{{url_for('public.view_room', room_id= room._id.room_id)}}">{{ room_title[room["_id"]["room_id"]][0] }}</a>
+            <a href="{{url_for('public.view_room', room_id= room._id.room_id)}}">{{
+              room_title[room["_id"]["room_id"]][0] }}</a>
             <p class="card-text"><small class="text-muted">{{room_title[room["_id"]["room_id"]][1]}}</small></p>
           </div>
         </div>
       </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-        
-      </ul>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    </ul>
   </nav>
 </div>
-<div class="d-none d-sm-flex flex-column col-12 col-sm-7 col-md-8 p-0 h-100" id="message-area" style="float: right; position:relative">
-  <div class="w-100 h-100 overlay"></div>
-    {% block message %}
-    <div style="background-color: #a4adca;">
+<div class="d-none d-sm-flex flex-column col-12 col-sm-7 col-md-8 p-0 h-100" id="rightside-pannel">
+  {% block message %}
+  <div style="background-color: #a4adca;">
 
-    </div>
-    {% endblock %}
+  </div>
+  {% endblock %}
 </div>
 {% endblock %}

@@ -1,4 +1,3 @@
-from time import time
 from datetime import datetime
 from flask import Blueprint, render_template, flash, send_file
 from flask import redirect, request, render_template, url_for
@@ -15,6 +14,7 @@ requestUser=chat_db.get_collection("requests")
 friends=chat_db.get_collection("friends")
 
 @public_blueprint.route('/')
+@login_required
 def home_page():
     rooms = get_rooms_for_user(current_user.username)
     friend=friends.find_one({'_id':current_user.username})
