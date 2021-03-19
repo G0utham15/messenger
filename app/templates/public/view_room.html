@@ -1,8 +1,7 @@
 {% extends "public/home_page.html" %}
 {% block message %}
 
-<div class="row d-flex flex-row align-items-center p-2 m-0 w-100" id="navbar"
-    style="background:#a4adca; justify-content: space-between;">
+<div class="row d-flex flex-row align-items-center p-2 m-0 w-100" id="msgNavbar">
 
     <div class="d-flex flex-column" style="width: fit-content;">
         {% if room.type=='chat' %}
@@ -11,14 +10,14 @@
         {% else %}
         <div class="text-white font-weight-bold" id="name">{{ room.name }}</div>
         <div class="text-white small" id="details">
-            {{roomMembers}}
+            {{roomMembers|join(',')}}
         </div>
 
         {% endif %}
     </div>
-    <div class="d-flex flex-row align-items-center ml-auto" style="width: fit-content;">
-        <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><img
-                src="/static/icons/three-dots-vertical.svg"></a>
+    <div class="d-flex flex-row align-items-center ml-auto threeDots">
+        <a href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="/static/icons/three-dots-vertical.svg"></a>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
             <li><a class="dropdown-item" href="{{url_for('public.roomSummery', room_id=room._id)}}">Export Chat</a></li>
             <li><a class="dropdown-item" href="#">Another action</a></li>
@@ -44,7 +43,7 @@
                 </div>
 
                 <div class="d-flex flex-row">
-                    <div class="body m-1 mr-2">{{ message.text }}</div>
+                    <div class="body m-1 mr-2"><p>{{ message.text|safe }}</p></div>
                     <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" id="msgCreated">
                         {{ message.created_at }}
                     </div>
@@ -59,7 +58,7 @@
                     {{message.sender}}
                 </div>
                 <div class="d-flex flex-row">
-                    <div class="body m-1 mr-2">{{ message.text }}</div>
+                    <div class="body m-1 mr-2">{{ message.text|safe }}</div>
                     <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" id="msgCreated">
                         {{ message.created_at }}
                     </div>
@@ -73,7 +72,9 @@
 </div>
 {% if room.type!='Channel' or room.type=='Channel' and current_user.username in room.admin %}
 <div class="justify-self-end align-items-center flex-row" id="input-area">
+    
     <form id="message_input_form">
+        <a class="btn" id="emoji" href="#"><img src="/static/icons/emoji-smile.svg"></a>
         <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input"
             placeholder="Enter your message here" autocomplete="off">
         <button class="text-muted px-3" type="submit">Send</button>
@@ -96,7 +97,20 @@
         <button class="text-muted px-3" type="submit">Send</button>
     </form>
 </div> -->
-<script type="text/javascript" src="/static/js/socketio.js"></script>
+<script src="/static/js/socketio.js"></script>
+<script src="/static/js/fgEmojiPicker.js"></script>
+    <script>
+        const emojiPicker = new FgEmojiPicker({
+            trigger: ['#emoji'],
+            position: ['top', 'right'],
+            preFetch: true,
+            dir:'/static/js/',
+            insertInto: document.getElementById('message_input'),
+            emit(obj, triggerElement) {
+                console.log(obj, triggerElement);
+            }
+        });
+    </script>
 <script>
     {% include '/public/chat.js' %}
 </script>

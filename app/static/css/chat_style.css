@@ -1,3 +1,7 @@
+body{
+    overflow: hidden;
+    background-color: #4296aa;
+}
 .wrapper {
     display: flex;
 }
@@ -8,11 +12,9 @@
 }
 
 #sidebar {
-    /* margin-top: 2em; */
+    position:relative;
     float: left; /* Make this div as wide as its contents */
     min-height: 96vh;
-    /* padding-left: 1em; */
-    /* padding-top: 3em; */
     padding-right:1em;
     border-right: 0.5px solid #898c91;
 }
@@ -156,4 +158,5 @@ input[type=text]:focus{
     position: relative;
     display: block;
     text-decoration: none;
+    background-color: transparent;
 }

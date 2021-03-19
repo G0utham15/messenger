@@ -82,6 +82,9 @@ def get_last_message(room_id, type):
     else:
         return ""
         
+def get_group_messages():
+    return list(transaction_message.find({}))
+    
 def get_messages(room_id, type):
     #offset = page * MESSAGE_FETCH_LIMIT
     if type=='chat':

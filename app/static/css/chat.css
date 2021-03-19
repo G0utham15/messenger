@@ -48,3 +48,13 @@
 #msgOptions {
     float: right;
 }
+
+#msgNavbar {
+    background:#a4adca; 
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.threeDots {
+    width: fit-content;
+}

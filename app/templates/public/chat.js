@@ -76,8 +76,8 @@ socket.on('receive_message', function (data) {
     if(data.username !=='{{current_user.username}}'){
         newNode.innerHTML = `
     <div class="align-self-${data.username === "{{current_user.username}}" ? "end self" : "start"} p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float:${data.username === "{{current_user.username}}" ? "right" : "left"} ; width: fit-content;">
-        <div class="options">
-            <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
+        <div class="options" id="msgOptions">
+            <a href="#"><img src="/static/icons/chevron-down.svg"></a>
         </div>
         <div class="small font-weight-bold text-primary">
             ${data.username}
@@ -94,8 +94,8 @@ socket.on('receive_message', function (data) {
     else{
         newNode.innerHTML = `
     <div class="align-self-${data.username === "{{current_user.username}}" ? "end self" : "start"} p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" style="float:${data.username === "{{current_user.username}}" ? "right" : "left"} ; width: fit-content;">
-        <div class="options">
-            <a href="#"><i class="fas fa-angle-down text-muted px-2"></i></a>
+        <div class="options" id="msgOptions">
+            <a href="#"><img src="/static/icons/chevron-down.svg"></a>
         </div>
         <div class="d-flex flex-row">
             <div class="body m-1 mr-2">${data.message}</div>

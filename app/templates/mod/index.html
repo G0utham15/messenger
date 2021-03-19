@@ -41,6 +41,8 @@
     </nav>
     <div class="container">
         
-        {% block body %}{% endblock %}
+        {% block body %}
+        {{mod_messages}}
+        {% endblock %}
     </div>
 </body>

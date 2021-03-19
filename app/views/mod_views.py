@@ -8,7 +8,8 @@ mod_blueprint = Blueprint('mods', __name__, template_folder='templates')
 @mod_blueprint.route("/")
 @login_required
 def index():
-    return render_template('mod/index.html')
+    mod_messages=get_group_messages()
+    return render_template('mod/index.html', mod_messages=mod_messages)
 
 @mod_blueprint.route("/user")
 @login_required
