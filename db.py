@@ -33,14 +33,15 @@ def add_room_member(room_id, room_name, username, added_by, is_room_admin=False,
     room_members_collection.insert_one(
         {'_id': {'room_id': ObjectId(room_id), 'username': username}, 'room_name': room_name, 'added_by': added_by,
          'added_at': datetime.now(), 'is_room_admin': is_room_admin, 'type':type})
-    rooms_collection.update_one({'_id': ObjectId(room_id)}, {'$push': {'users': username}})
+    
 
 
-def add_room_members(room_id, room_name, usernames, added_by, type='group'):
+def add_room_members(room_id, room_name, usernames, added_by, type='group', official='False'):
     room_members_collection.insert_many(
         [{'_id': {'room_id': ObjectId(room_id), 'username': username}, 'room_name': room_name, 'added_by': added_by,
-          'added_at': datetime.now(), 'is_room_admin': False, 'type':type} for username in usernames])
-
+          'added_at': datetime.now(), 'is_room_admin': False, 'type':type, 'official':official} for username in usernames])
+    for username in usernames:
+        rooms_collection.update_one({'_id': ObjectId(room_id)}, {'$push': {'users': username}})
 
 def remove_room_members(room_id, usernames):
     room_members_collection.delete_many(

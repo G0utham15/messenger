@@ -65,7 +65,6 @@ def create_app(extra_config_settings={}):
     from .models.user_models import Role, User
     app.user_datastore = MongoEngineUserDatastore(db, User, Role)
     security.init_app(app, app.user_datastore, register_form=registerForm)
-    # datastore.create_user(email='matt@nobien.net', password='password')
 
     babel.init_app(app)  # Initialize flask_babelex
 

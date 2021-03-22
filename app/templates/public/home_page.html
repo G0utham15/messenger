@@ -40,9 +40,9 @@
               <input type="text" name="room_name" autocomplete="off" id="roomname">
             </div>
             <br>
-            <label for="roomname" class="form-label">Friends</label>
+            <label for="friends" class="form-label">Friends</label>
             {% for i in friend.friends %}
-            <div class="form-check">
+            <div class="form-check" id="friends">
               <input class="form-check-input" type="checkbox" value="{{i}}" id="flexCheckDefault" name="friends">
               <label class="form-check-label" for="flexCheckDefault">
                 {{i}}
@@ -86,7 +86,7 @@
         <div class="card border-light">
           <div class="card-body">
             <a href="{{url_for('public.view_room', room_id= room._id.room_id)}}">{{
-              room_title[room["_id"]["room_id"]][0] }}</a>
+              room_title[room["_id"]["room_id"]][0]|safe }}</a>
             <p class="card-text"><small class="text-muted">{{room_title[room["_id"]["room_id"]][1]}}</small></p>
           </div>
         </div>
@@ -101,7 +101,11 @@
 <div class="d-none d-sm-flex flex-column col-12 col-sm-7 col-md-8 p-0 h-100" id="rightside-pannel">
   {% block message %}
   <div style="background-color: #a4adca;">
-
+    {% if current_user.has_role('admin') %}
+    <a href="url_for('admin.index')"><button>Admin</button></a>
+    {% elif current_user.has_role('moderator') %}
+    <a href="{{url_for('mods.index')}}"><button>moderator</button></a>
+    {% endif %}
   </div>
   {% endblock %}
 </div>

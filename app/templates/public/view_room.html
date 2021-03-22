@@ -8,10 +8,16 @@
         <div class="text-white font-weight-bold" id="name">{{roomMembers[0]}}</div>
         <div class="text-white small" id="status"></div>
         {% else %}
-        <div class="text-white font-weight-bold" id="name">{{ room.name }}</div>
+        <div class="text-white font-weight-bold" id="name">{{ room.name|safe }}</div>
+        {% if room.official=="True" %}
+        <div class="text-white small" id="details">
+            This is Official Channel of this platform
+        </div>
+        {% else %}
         <div class="text-white small" id="details">
             {{roomMembers|join(',')}}
         </div>
+        {% endif %}
 
         {% endif %}
     </div>

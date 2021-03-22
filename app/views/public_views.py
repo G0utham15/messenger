@@ -102,9 +102,13 @@ def accept_user(username):
 @public_blueprint.route('/create-room', methods=['POST'])
 @login_required
 def create_room():
-    message = ''
     if request.method == 'POST':
         room_name = request.form.get('room_name')
+        banned=['<img src="/static/icons/patch-check-fill.svg">']
+        for i in banned:
+            if i in room_name:
+                flash('You cannot Add that to symbol in the room title')
+                return redirect(url_for('public.home_page'))
         usernames = request.form.getlist('friends')
         type_room=request.form.get('type')
         if len(room_name) and len(usernames):
