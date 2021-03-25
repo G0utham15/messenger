@@ -35,7 +35,6 @@
 
 <div id="display-message-section">
     <ul class="list-group">
-        <!-- <button type="button" id="load_older_messages_btn">Load Older Messages</button> -->
         {% for message in messages %}
         <li class="list-group-item">
             <div>
@@ -96,13 +95,7 @@
     </div>
 </fieldset>
 {% endif %}
-<!-- <div class="d-none justify-self-end align-items-center flex-row" id="input-area">
-    <a href="#"><i class="far fa-smile text-muted px-3" style="font-size:1.5rem;"></i></a>
-    <form id="message_input_form">
-        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input" placeholder="Enter your message here">
-        <button class="text-muted px-3" type="submit">Send</button>
-    </form>
-</div> -->
+
 <script src="/static/js/socketio.js"></script>
 <script src="/static/js/fgEmojiPicker.js"></script>
     <script>

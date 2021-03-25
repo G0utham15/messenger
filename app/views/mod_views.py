@@ -28,8 +28,8 @@ def create_channel():
         usernames = [i['username'] for i in list(users_collection.find({"roles":[]},{'username':1, '_id':0}))] 
         type_room="Channel"
         if len(room_name) and len(usernames):
-            room_id = save_room(room_name, current_user.username, type_room)
-            add_room_members(room_id, room_name, usernames, current_user.username, type_room, official=True)
+            room_id = save_room(room_name, current_user.username, type_room, official=True)
+            add_room_members(room_id, room_name, usernames, current_user.username, type_room)
             flash("channel created Successfully", "success")
             return redirect(url_for("mods.index"))
             #return redirect(url_for('mod.view_room', room_id=room_id))

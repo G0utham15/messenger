@@ -39,6 +39,9 @@ def sidebarGen():
                 roomMembers=[i["_id"]["username"] for i in room_members if i["_id"]["username"]!=current_user.username]
             room_title[room_id]=[roomMembers[0], dumps(messages)]
     return room_title
+
+@public_blueprint.before_request
+
 @public_blueprint.route('/search', methods=['POST'])
 @login_required
 def search_user():
@@ -66,6 +69,7 @@ def requests(**kwargs):
 @login_required
 def accept(username):
     room_name="#"
+    requestUser.find_one_and_delete({'from': username,'to':current_user.username})
     room_id = save_room(room_name, current_user.username, 'chat')
     add_room_member(room_id, room_name, username, current_user.username,True, 'chat')
     addFriend(username, current_user.username)
@@ -90,14 +94,6 @@ def leave_room(room_id):
         rooms_collection.delete_one({'_id':ObjectId(room_id)})
     return redirect("/")
 
-"""@public_blueprint.route('/accept/<username>', methods=['GET','POST'])
-@login_required
-def accept_user(username):
-    friends={"username":current_user.username, "friends":[]}
-    request=requestUser.insert_one(
-        {'name': current_user.name, 'username': current_user.username, 'created_at': datetime.now()}).inserted_id
-    return username
-"""
 
 @public_blueprint.route('/create-room', methods=['POST'])
 @login_required

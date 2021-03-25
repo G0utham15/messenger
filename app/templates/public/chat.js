@@ -114,13 +114,7 @@ socket.on('receive_message', function (data) {
 });
 
 socket.on('join_room_announcement', function (data) {
-    if (data.username !== "{{ username }}") {
-        const status=document.getElementById('status');
-        status.innerHTML = `<h6>Online</h6>`;
-    }
 });
 
 socket.on('leave_room_announcement', function (data) {
-    const status=document.getElementById('status');
-    status.innerHTML = `<h6>Last seen at: </h6>`;
 });

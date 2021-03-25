@@ -14,9 +14,9 @@ user_rooms= chat_db.get_collection("user_rooms")
 group_transactions=chat_db.get_collection("groupTransactions")
 transaction_message=chat_db.get_collection("transactionMessage")
 
-def save_room(room_name, created_by, type='group'):
+def save_room(room_name, created_by, type='group', official='False'):
     room_id = rooms_collection.insert_one(
-        {'name': room_name, 'created_by': created_by, 'created_at': datetime.now(), 'admin':[created_by], 'users':[created_by], 'type':type}).inserted_id
+        {'name': room_name, 'created_by': created_by, 'created_at': datetime.now(), 'admin':[created_by], 'users':[created_by], 'type':type, 'official':official}).inserted_id
     add_room_member(room_id, room_name, created_by, created_by,  True, type)
     return room_id
 
@@ -36,10 +36,10 @@ def add_room_member(room_id, room_name, username, added_by, is_room_admin=False,
     
 
 
-def add_room_members(room_id, room_name, usernames, added_by, type='group', official='False'):
+def add_room_members(room_id, room_name, usernames, added_by, type='group'):
     room_members_collection.insert_many(
         [{'_id': {'room_id': ObjectId(room_id), 'username': username}, 'room_name': room_name, 'added_by': added_by,
-          'added_at': datetime.now(), 'is_room_admin': False, 'type':type, 'official':official} for username in usernames])
+          'added_at': datetime.now(), 'is_room_admin': False, 'type':type} for username in usernames])
     for username in usernames:
         rooms_collection.update_one({'_id': ObjectId(room_id)}, {'$push': {'users': username}})
 

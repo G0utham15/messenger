@@ -62,7 +62,20 @@
     <div class="container">
         
         {% block body %}
-        {{mod_messages}}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+
+       
+            {% for message in mod_messages %}
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Message: {{message.text}}</h5>
+                        <a class="btn btn-primary" href="#" role="button">Flag</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %} 
+        </div>
         {% endblock %}
     </div>
 </body>
