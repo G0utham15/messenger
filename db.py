@@ -100,6 +100,11 @@ def get_messages(room_id, type):
                 message['text']=list(transaction_message.find({'_id':message['body']}))[0]['text']
                 message['date']=message['created_at'].strftime("%d-%m-%y")
                 message['created_at'] = message['created_at'].strftime("%H:%M")
+                if chat_db.flagged_messages.find_one({'_id':message['body']}):
+                    message['flagged']=True
+                else:
+                    message['flagged']=False
+
     """
     messages = list(
         messages_collection.find({'room_id': room_id}).sort('_id', DESCENDING).limit(MESSAGE_FETCH_LIMIT).skip(offset))

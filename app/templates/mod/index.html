@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
+    
 </head>
 
 <body>
@@ -59,6 +59,7 @@
             </div>
         </div>
     </nav>
+    
     <div class="container">
         
         {% block body %}
@@ -70,7 +71,13 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Message: {{message.text}}</h5>
-                        <a class="btn btn-primary" href="#" role="button">Flag</a>
+                        <h5>Message Count: {{message.count}}</h5>
+                        <h5>Message Flagged: {{message.flagged}}</h5>
+                        {%if not message.flagged %}
+                            <a class="btn btn-primary" href="{{url_for('mods.flag', messageId=message._id)}}" role="button">Flag</a>
+                        {%else%}
+                        <h5>Already Flagged</h5>
+                        {%endif%}
                     </div>
                 </div>
             </div>
@@ -78,4 +85,5 @@
         </div>
         {% endblock %}
     </div>
+    {% include "security/_messages.html" %}
 </body>

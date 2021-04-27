@@ -8,6 +8,13 @@ mod_blueprint = Blueprint('mods', __name__, template_folder='templates')
 @login_required
 def index():
     mod_messages=get_group_messages()
+    for i in mod_messages:
+        i['count']=group_transactions.count_documents({'body':i['_id']})
+        if chat_db.flagged_messages.find_one({'_id':i['_id']}):
+            i['flagged']=True
+        else:
+            i['flagged']=False
+    mod_messages=sorted(mod_messages, key=lambda i:i['count'], reverse=True)
     return render_template('mod/index.html', mod_messages=mod_messages)
 
 @mod_blueprint.route("/user")
@@ -19,6 +26,13 @@ def users():
 @login_required
 def profile():
     return render_template('mod/profile.html')
+
+@mod_blueprint.route("/flag/<messageId>")
+@login_required
+def flag(messageId):
+    chat_db.flagged_messages.insert_one(transaction_message.find_one({"_id":messageId}))
+    flash("Flagged the message", "success")
+    return redirect(url_for("mods.index"))
 
 @mod_blueprint.route("/create", methods=['GET', 'POST'])
 @login_required

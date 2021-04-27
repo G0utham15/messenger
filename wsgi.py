@@ -1,11 +1,10 @@
-from app import create_app
 from flask import redirect, request
 from flask_socketio import SocketIO, join_room, leave_room
-from flask_sslify import SSLify
+
+from app import create_app
 from db import *
-import logging
+
 app = create_app()
-#sslify=SSLify(app)
 socketio = SocketIO(app)
 @app.route("/")
 def home():
@@ -30,15 +29,6 @@ def handle_join_room_event(data):
 def handle_leave_room_event(data):
     leave_room(data['room'])
     socketio.emit('leave_room_announcement', data, room=data['room'])
-
-@app.before_request
-def before_request():
-    """
-    if request.url.startswith('http://'):
-        url = request.url.replace('http://', 'https://', 1)
-        code = 301
-        return redirect(url, code=code)
-    """
 
 if __name__=="__main__":
     socketio.run(app, debug=True)
