@@ -217,7 +217,6 @@ def summery(room_id, filename):
 @public_blueprint.before_request
 def keyGen():
     users=list(chat_db.user.find({}, {"username":1, "_id":True}))
-    print(chat_db.keys.find_one({'username':current_user.username}, {'key':1, "_id":False})['key'])
     for i in users:
         if chat_db.keys.find_one({"username":i['username']}):
             continue
