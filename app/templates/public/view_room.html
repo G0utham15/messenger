@@ -1,197 +1,122 @@
 {% extends "public/home_page.html" %}
 {% block message %}
-<div class="card text-dark bg-light">
-    <div class="card-body" style="padding: 0.5rem;">
-        <div style="float: left;">
-            <h5 class="card-title">{{ room.name }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted" style="margin: 0px;">
-                {% for i in roomMembers %}
-                {% if i!=current_user.username %}
-                {{i}}
-                {% endif %}
-                {% endfor %}
-            </h6>
+
+<div class="row d-flex flex-row align-items-center p-2 m-0 w-100" id="msgNavbar">
+
+    <div class="d-flex flex-column" style="width: fit-content;">
+        {% if room.type=='chat' %}
+        <div class="text-white font-weight-bold" id="name">{{roomMembers[0]}}</div>
+        <div class="text-white small" id="status"></div>
+        {% else %}
+        <div class="text-white font-weight-bold" id="name">{{ room.name|safe }}</div>
+        {% if room.official=="True" %}
+        <div class="text-white small" id="details">
+            This is Official Channel of this platform
         </div>
-        <div class="dropdown fs-2" style="float: right; ">
-            <button class="btn" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="/static/icons/three-dots-vertical.svg">
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><a class="dropdown-item btn btn-danger" href="{{url_for('public.leave_room', room_id=room._id)}}">Leave Room</a></li>
-            </ul>
-          </div>
-          
+        {% else %}
+        <div class="text-white small" id="details">
+            {{roomMembers|join(',')}}
+        </div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+    <div class="d-flex flex-row align-items-center ml-auto threeDots">
+        <a href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="/static/icons/three-dots-vertical.svg"></a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+            <li><a class="dropdown-item" href="{{url_for('public.roomSummery', room_id=room._id)}}">Export Chat</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><a class="dropdown-item btn btn-danger" href="{{url_for('public.leave_room', room_id=room._id)}}">Leave
+                    Room</a></li>
+        </ul>
     </div>
 </div>
 
-<button type="button" id="load_older_messages_btn">Load Older Messages</button>
-<div id="messages">
+<div id="display-message-section">
     <ul class="list-group">
         {% for message in messages %}
+        <li class="list-group-item">
+            <div>
+                {{message.date}}
+            </div>
             {% if message.sender==current_user.username %}
-            <li class="list-group-item">
-                <div class="col card text-center" style="float: right; width: fit-content;">
-                    <div class="card-body">
-                    <p class="card-text">
-                        {{ message.text }}
-                    </p>
+
+            <div class="align-self-end self p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" id="myMsg">
+                <div class="options" id="msgOptions">
+                    <a href="#"><img src="/static/icons/chevron-down.svg"></a>
+                </div>
+
+                <div class="d-flex flex-row">
+                    <div class="body m-1 mr-2"><p>{{ message.text|safe }}</p></div>
+                    {%if message.flagged%}
+                        <img src="/static/icons/bi-exclamation-circle-fill.svg">
+                    {%endif%}
+                    <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" id="msgCreated">
+                        {{ message.created_at }}
                     </div>
-                    <div class="card-footer text-muted">{{ message.created_at }}</div>
                 </div>
-                
-            </li>
+            </div>
             {% else %}
-            <li class="list-group-item">
-                <div class="col card text-center" style="float: left; width: fit-content;">
-                    <div class="card-header">{{ message.sender }}</div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                {{ message.text }}
-                            </p>
-                        </div>
-                        <div class="card-footer text-muted">{{ message.created_at }}</div>
+            <div class="align-self-start p-1 my-1 mx-3 rounded bg-white shadow-sm message-item" id="otherMsg">
+                <div class="options" id="msgOptions">
+                    <a href="#"><img src="/static/icons/chevron-down.svg"></a>
                 </div>
-            </li>
-            
+                <div class="small font-weight-bold text-primary">
+                    {{message.sender}}
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="body m-1 mr-2">{{ message.text|safe }}</div>
+                    {%if message.flagged%}
+                        <img src="/static/icons/exclamation-circle-fill.svg">
+                    {%endif%}
+                    <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" id="msgCreated">
+                        {{ message.created_at }}
+                    </div>
+                </div>
+            </div>
             {% endif %}
+        </li>
         {% endfor %}
-        
+        <div class="d-flex flex-column" id="messages"></div>
     </ul>
 </div>
-<div>
-<form id="message_input_form">
-    <input type="text" id="message_input" placeholder="Enter your message here">
-    <button type="submit">Send</button>
-</form>
+{% if room.type!='Channel' or room.type=='Channel' and current_user.username in room.admin %}
+<div class="justify-self-end align-items-center flex-row" id="input-area">
+    
+    <form id="message_input_form">
+        <a class="btn" id="emoji" href="#"><img src="/static/icons/emoji-smile.svg"></a>
+        <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input"
+            placeholder="Enter your message here" autocomplete="off">
+        <button class="text-muted px-3" type="submit">Send</button>
+    </form>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
-<script>
-    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+{% else %}
+<fieldset disabled>
+    <div class="justify-self-end align-items-center flex-row" id="input-area">
+        <form id="message_input_form">
+            <input type="text" class="flex-grow-1 border-0 px-3 py-2 my-3 rounded shadow-sm" id="message_input"
+                placeholder="You don't have permission to send">
+        </form>
+    </div>
+</fieldset>
+{% endif %}
 
-    socket.on('connect', function () {
-        socket.emit('join_room', {
-            username: "{{ username }}",
-            room: "{{ room._id }}"
+<script src="/static/js/socketio.js"></script>
+<script src="/static/js/fgEmojiPicker.js"></script>
+    <script>
+        const emojiPicker = new FgEmojiPicker({
+            trigger: ['#emoji'],
+            position: ['top', 'right'],
+            preFetch: true,
+            dir:'/static/js/',
+            insertInto: document.getElementById('message_input'),
+            emit(obj, triggerElement) {
+                console.log(obj, triggerElement);
+            }
         });
-
-        let message_input = document.getElementById('message_input');
-        
-        document.getElementById('message_input_form').onsubmit = function (e) {
-            e.preventDefault();
-            let message = message_input.value.trim();
-            if (message.length) {
-                socket.emit('send_message', {
-                    username: "{{ username }}",
-                    room: "{{ room._id }}",
-                    message: message
-                })
-            }
-            message_input.value = '';
-            message_input.focus();
-        }
-    });
-
-    let page = 0;
-
-    document.getElementById("load_older_messages_btn").onclick = (e) => {
-        page += 1;
-        fetch("/rooms/{{ room._id }}/messages?page=" + page, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            response.json().then(messages => {
-                messages.reverse().forEach(message => prepend_message(message.text, message.sender, message.created_at));
-            })
-        })
-    };
-
-    function prepend_message(message, username, created_at) {
-        const newNode = document.createElement('div');
-        if(username=={{current_user.username}}){
-            newNode.innerHTML =`
-                <div class="card text-center" style="float: right; width: fit-content;">
-                <div class="card-body">
-                  <p class="card-text">
-                    {{ message }}
-                  </p>
-                </div>
-                <div class="card-footer text-muted">{{ created_at }}</div>
-              </div>
-            `;
-        }
-        else{
-            `
-                <div class="card text-center" style="float: left; width: fit-content;">
-                <div class="card-header">{{ username }}</div>
-                <div class="card-body">
-                  <p class="card-text">
-                    {{ message }}
-                  </p>
-                </div>
-                <div class="card-footer text-muted">{{ created_at }}</div>
-              </div>
-            `;
-        }
-        const messages_div = document.getElementById('messages');
-        messages_div.insertBefore(newNode, messages_div.firstChild);
-    }
-
-    window.onbeforeunload = function () {
-        socket.emit('leave_room', {
-            username: "{{ username }}",
-            room: "{{ room._id }}"
-        })
-    };
-
-    socket.on('receive_message', function (data) {
-        console.log(data);
-        const newNode = document.createElement('div');
-        if(data.username=="{{current_user.username}}"){
-            newNode.innerHTML =`
-                <div class="card text-center" style="float: right; width: fit-content;">
-                <div class="card-body">
-                  <p class="card-text">
-                    ${data.message}
-                  </p>
-                </div>
-                <div class="card-footer text-muted">${data.created_at}</div>
-              </div>
-            `;
-        }
-        else{
-            newNode.innerHTML =`
-                <div class="card text-center" style="float: left; width: fit-content;">
-                <div class="card-header">${data.username}</div>
-                <div class="card-body">
-                  <p class="card-text">
-                    ${data.message}
-                  </p>
-                </div>
-                <div class="card-footer text-muted">${data.created_at}</div>
-              </div>
-            `;
-        }
-        document.getElementById('messages').appendChild(newNode);
-    });
-
-    socket.on('join_room_announcement', function (data) {
-        console.log(data);
-        if (data.username !== "{{ username }}") {
-            const newNode = document.createElement('div');
-            newNode.innerHTML = `<b>${data.username}</b> has joined the room`;
-            document.getElementById('messages').appendChild(newNode);
-        }
-    });
-
-    socket.on('leave_room_announcement', function (data) {
-        console.log(data);
-        const newNode = document.createElement('div');
-        newNode.innerHTML = `<b>${data.username}</b> has left the room`;
-        document.getElementById('messages').appendChild(newNode);
-    });
+    </script>
+<script>
+    {% include '/public/chat.js' %}
 </script>
 {% endblock %}

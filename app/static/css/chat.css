@@ -1,0 +1,60 @@
+#messageInput {
+    position: fixed;
+    bottom: 0px; 
+    width: 100%; 
+    background-color:azure
+}
+
+#message_input {
+    width: 60%;
+    padding-left:10px;
+}
+
+#myMsg {
+    float: right; 
+    width: fit-content;
+    border-color: rgb(43, 41, 41);
+    border-width: 0.5px;
+    border-style: solid;
+    background-color: #94ce9d;
+    animation-name: fadeIn;
+    animation-duration: 0.75s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-in-out;
+}
+
+#otherMsg {
+    float: left; 
+    width: fit-content;
+    border-color: rgb(43, 41, 41);
+    border-width: 0.5px;
+    border-style: solid;
+    background-color: #4a85ac;
+    animation-name: fadeIn;
+    animation-duration: 0.75s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+  }
+
+#msgCreated {
+    width:75px;
+}
+
+#msgOptions {
+    float: right;
+}
+
+#msgNavbar {
+    background:#a4adca;
+    justify-content: space-between;
+    padding: 8px;
+}
+
+.threeDots {
+    width: fit-content;
+}

@@ -1,8 +1,9 @@
-from app import create_app
-from flask import redirect
+from flask import redirect, request
 from flask_socketio import SocketIO, join_room, leave_room
+
+from app import create_app
 from db import *
-import logging
+
 app = create_app()
 socketio = SocketIO(app)
 @app.route("/")
@@ -11,26 +12,23 @@ def home():
 
 @socketio.on('send_message')
 def handle_send_message_event(data):
-    logging.info("{} has sent message to the room {}: {}".format(data['username'],
-                                                                    data['room'],
-                                                                    data['message']))
-    data['created_at'] = datetime.now().strftime("%d %b, %H:%M")
-    save_message(data['room'], data['message'], data['username'])
+    data['created_at'] = datetime.now()
+    data['date']=data['created_at'].strftime("%d-%m-%y")
+    data['created_at'] = data['created_at'].strftime("%H:%M")
+    save_message(data['room'], data['message'], data['username'], data['roomType'])
     socketio.emit('receive_message', data, room=data['room'])
 
 
 @socketio.on('join_room')
 def handle_join_room_event(data):
-    logging.info("{} has joined the room {}".format(data['username'], data['room']))
     join_room(data['room'])
     socketio.emit('join_room_announcement', data, room=data['room'])
 
 
 @socketio.on('leave_room')
 def handle_leave_room_event(data):
-    logging.info("{} has left the room {}".format(data['username'], data['room']))
     leave_room(data['room'])
     socketio.emit('leave_room_announcement', data, room=data['room'])
 
 if __name__=="__main__":
-    socketio.run(app)
+    socketio.run(app, debug=True)

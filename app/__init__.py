@@ -65,7 +65,6 @@ def create_app(extra_config_settings={}):
     from .models.user_models import Role, User
     app.user_datastore = MongoEngineUserDatastore(db, User, Role)
     security.init_app(app, app.user_datastore, register_form=registerForm)
-    # datastore.create_user(email='matt@nobien.net', password='password')
 
     babel.init_app(app)  # Initialize flask_babelex
 
@@ -81,8 +80,8 @@ def create_app(extra_config_settings={}):
     adminDash = Admin(app, name='admin', template_mode='bootstrap4',url="/admin", endpoint='admin')#, index_view=adminView(url='/admin', endpoint='admin'))
     adminDash.add_view(AdminUserView(User))
     adminDash.add_view(ModelView(Role))
-    path = op.join(op.dirname(__file__), './')
-    adminDash.add_view(FileAdmin(path, '/', name='Files'))
+    #path = op.join(op.dirname(__file__), './')
+    #adminDash.add_view(FileAdmin(path, '/', name='Files'))
     adminDash.add_link(MenuLink(name='Profile', endpoint='members.member_page'))
     adminDash.add_link(MenuLink(name='Logout', endpoint='security.logout'))
     return app

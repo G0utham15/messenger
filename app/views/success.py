@@ -28,11 +28,11 @@ def set_lang(lang):
 def init_my_blueprint():
     if not app.user_datastore.get_user('user@example.com'):
         app.user_datastore.create_user(email='user@example.com',
-                                       password='Password1')
+                                       password='Password1', roles=[], username='test_user')
     if not app.user_datastore.get_user('admin@example.com'):
         app.user_datastore.create_role(name="admin")
         app.user_datastore.create_user(email='admin@example.com',
-                                       password='Password1', roles=['admin'])
+                                       password='Password1', roles=['admin'], username='admin15')
 
 
 @members_blueprint.before_app_request
@@ -51,13 +51,14 @@ def before_request():
 @login_required
 def member_page():
     if current_user.is_authenticated:
-        if current_user.has_role("admin"):
+        """if current_user.has_role("admin"):
             return redirect('/admin')
         elif current_user.has_role("moderator"):
             return redirect('/mod')
         elif current_user.has_role("biz"):
             return redirect('/biz')
         else:
-            return redirect('/user')
+            return redirect('/user')"""
+        return redirect('/user')
     else:
         return redirect(url_for('security.login'))
