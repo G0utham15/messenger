@@ -49,3 +49,24 @@ def create_channel():
             #return redirect(url_for('mod.view_room', room_id=room_id))
         else:
             flash("Failed to create room", 'error')
+
+@mod_blueprint.route('/createRoom', methods=['POST'])
+@login_required
+def createRoom():
+    if request.method == 'POST':
+        room_name = request.form.get('room_name')
+        banned=['<img src="/static/icons/patch-check-fill.svg">']
+        for i in banned:
+            if i in room_name:
+                flash('You cannot Add that to symbol in the room title')
+                return redirect(url_for('public.home_page'))
+        usernames = request.form.getlist('friends')
+        type_room=request.form.get('type')
+        if len(room_name) and len(usernames):
+            room_id = save_room(room_name, current_user.username, type_room)
+            if current_user.username in usernames:
+                usernames.remove(current_user.username)
+            add_room_members(room_id, room_name, usernames, current_user.username, type_room)
+            return redirect(url_for('public.view_room', room_id=room_id))
+        else:
+            flash("Failed to create room", 'error')

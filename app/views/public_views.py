@@ -117,7 +117,10 @@ def create_room():
             flash("Failed to create room", 'error')
     #return render_template('chat/create_room.html', message=message)
 
-
+@public_blueprint.route('/createRoom', methods=['POST','GET'])
+@login_required
+def createRoom():
+    return request.form
 @public_blueprint.route('/rooms/<room_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_room(room_id):
