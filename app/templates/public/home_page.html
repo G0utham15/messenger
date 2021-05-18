@@ -101,7 +101,7 @@
   {% block message %}
   <div style="background-color: #a4adca;">
     {% if current_user.has_role('admin') %}
-    <a href="url_for('admin.index')"><button>Admin</button></a>
+    <a href="{{url_for('admin.index')}}"><button>Admin</button></a>
     {% elif current_user.has_role('moderator') %}
     <a href="{{url_for('mods.index')}}"><button>moderator</button></a>
     {% endif %}
