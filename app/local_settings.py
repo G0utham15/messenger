@@ -6,16 +6,16 @@ import os
 # *****************************
 
 # DO NOT use "DEBUG = True" in production environments
-DEBUG = True
+DEBUG = False
 
 # DO NOT use Unsecure Secrets in production environments
 # Generate a safe one with:
 #    python -c "import os; print(repr(os.urandom(24)));"
 SECRET_KEY = 'V\xd4\x17\x04\xf4\xa4\x06$s\x14\x0b3X\xf8?\xd6\x11\xb5_Q\xdawq\xb7'
-COOKIE_SECURE = 'Secure'
+#COOKIE_SECURE = 'Secure'
 COOKIE_DURATION = timedelta(days=30)
 SECURITY_TOKEN_MAX_AGE=120
-SESSION_COOKIE_SECURE=True,
+#SESSION_COOKIE_SECURE=True,
 SESSION_COOKIE_HTTPONLY=True,
 SESSION_COOKIE_SAMESITE='Lax'
 

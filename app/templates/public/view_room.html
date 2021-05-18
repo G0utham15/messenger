@@ -50,7 +50,7 @@
                 <div class="d-flex flex-row">
                     <div class="body m-1 mr-2"><p>{{ message.text|safe }}</p></div>
                     {%if message.flagged%}
-                        <img src="/static/icons/bi-exclamation-circle-fill.svg">
+                        <img src="/static/icons/exclamation-circle-fill.svg">
                     {%endif%}
                     <div class="time ml-auto small text-right flex-shrink-0 align-self-end text-muted" id="msgCreated">
                         {{ message.created_at }}
