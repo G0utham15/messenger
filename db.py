@@ -8,6 +8,7 @@ from Cryptodome.Cipher import AES
 import os
 from Cryptodome.Random import get_random_bytes
 
+#client=MongoClient("mongodb+srv://g0utham:Sg106271@cluster0.v0h6w.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 client = MongoClient(host="localhost", port=27017)
 
 chat_db = client.get_database("auth") 
